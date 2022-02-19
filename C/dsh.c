@@ -147,13 +147,13 @@ int main(int argc, char** argv) {
         // TODO: restore the stdio fds before interacting
         //       with the user again
 
-        //dup2(origout, 1);
+        dup2(origout, 1);
         //close(origout);
 
-        //dup2(origin, 0);
+        dup2(origin, 0);
         // close(origout);
 
-        //dup2(origerr, 2);
+        dup2(origerr, 2);
         // close(origerr);
 
 
