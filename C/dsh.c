@@ -13,8 +13,54 @@ void exec_command(char* command) {
     int i=1;
     while((args[i++]=strtok(NULL," ")));
 
+
+    int j = 0;
+    while (args[j] != NULL) {
+        if (strcmp(args[j], ">") == 0) {
+            char* filename = args[j+1];
+            args[j] = 0;
+            int fd = open(filename, O_CREAT|O_RDWR ,0755);  // tail would be 
+            if (fd == -1) {
+                perror("File error");
+                exit(0);
+            }
+            dup2(fd, 1);
+            close(fd);
+        } else if (strcmp(args[j], "<") == 0) {
+        
+            char* filename = args[j+1];
+            args[j] = 0;
+            int fd = open(filename, O_CREAT|O_RDWR ,0755);  // tail would be 
+            if (fd == -1) {
+                perror("File error");
+                exit(0);
+            }
+            dup2(fd, 0);
+            close(fd);
+           
+        
+        
+        } else if (strcmp(args[j], "2>") == 0) {
+            char* filename = args[j+1];
+            args[j] = 0;
+            int fd = open(filename, O_CREAT|O_RDWR ,0755);  // tail would be 
+            if (fd == -1) {
+                perror("File error");
+                exit(0);
+            }
+            dup2(fd, 2);  // makes it so output is written to the file
+            close(fd);
+        }
+        j++;
+    }
+    
+
+
     // TODO: search the path instead of running "program directly"
     char* path = getenv("PATH");
+
+
+
     
     char* token = strtok(path, ":");
     // aaa/aaa/dsfds/dsfgd/: asdfsd/sadf:
@@ -40,12 +86,7 @@ void run_sequence(char* head, char* tail) {
 }
 
 void run_writeto(char* head, char* tail) {
-    int fd = open(tail, O_CREAT|O_RDWR ,0755);  // tail would be 
-    if (fd == -1) {
-    	perror("File error");
-    	exit(0);
-    }
-    dup2(fd, 1);  // makes it so output is written to the file
+      // makes it so output is written to the file
    
     
     //fprintf(stderr, "Uh-oh, I dont know how to <");
@@ -61,34 +102,7 @@ void run(char *line) {
     else if((sep=strstr(line,"|"))) {
         *sep=0;        
         run_pipeline(line,sep+1);
-    } else if ((sep=strstr(line, ">"))) {
-        if (!fork()) {
-            *sep=0;
-            run_writeto(line, sep+1);
-            exec_command(line);
-        } else {
-            wait(0);
-        }
-        
-        
-        
-    }
-     else if ((sep=strstr(line, "<"))) {
-        if (!fork()) {
-            *sep=0;
-            int fd = open(sep+1, O_CREAT|O_RDWR ,0755);  // tail would be 
-            if (fd == -1) {
-                perror("File error");
-                exit(0);
-            }
-            dup2(fd, 0);
-            exec_command(line);
-        } else {
-            wait(0);
-        }    
-        
-        
-    }
+    } 
     else {
         if(!fork()) 
          exec_command(line);
@@ -133,13 +147,13 @@ int main(int argc, char** argv) {
         // TODO: restore the stdio fds before interacting
         //       with the user again
 
-        dup2(origout, 1);
+        //dup2(origout, 1);
         //close(origout);
 
-        dup2(origin, 0);
+        //dup2(origin, 0);
         // close(origout);
 
-        // dup2(origerr, 2);
+        //dup2(origerr, 2);
         // close(origerr);
 
 
