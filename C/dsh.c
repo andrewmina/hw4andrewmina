@@ -18,7 +18,7 @@ void exec_command(char* command) {
     while (args[j] != NULL) {
         if (strcmp(args[j], ">") == 0) {
             char* filename = args[j+1];
-            args[j] = 0;
+            args[j] = 1;
             int fd = open(filename, O_CREAT|O_RDWR ,0755);  // tail would be 
             if (fd == -1) {
                 perror("File error");
@@ -42,7 +42,7 @@ void exec_command(char* command) {
         
         } else if (strcmp(args[j], "2>") == 0) {
             char* filename = args[j+1];
-            args[j] = 0;
+            args[j] = 2;
             int fd = open(filename, O_CREAT|O_RDWR ,0755);  // tail would be 
             if (fd == -1) {
                 perror("File error");
@@ -85,12 +85,7 @@ void run_sequence(char* head, char* tail) {
     fprintf(stderr,"Uh-oh, I don't know how to do sequences.");
 }
 
-void run_writeto(char* head, char* tail) {
-      // makes it so output is written to the file
-   
-    
-    //fprintf(stderr, "Uh-oh, I dont know how to <");
-}
+
 
 void run(char *line) {
     char *sep;
@@ -122,6 +117,9 @@ int main(int argc, char** argv) {
     //       to put our <N>.stdout and <N>.stderr files in.
     //int counter = 0;
 
+    //int outfile = open(folder, O_CREAT|O_RDWR, 0644)
+
+
     
 
     printf("dsh> ");
@@ -147,13 +145,13 @@ int main(int argc, char** argv) {
         // TODO: restore the stdio fds before interacting
         //       with the user again
 
-        dup2(origout, 1);
+        //dup2(origout, 1);
         //close(origout);
 
-        dup2(origin, 0);
+        //dup2(origin, 0);
         // close(origout);
 
-        dup2(origerr, 2);
+        //dup2(origerr, 2);
         // close(origerr);
 
 
