@@ -18,7 +18,7 @@ void exec_command(char* command) {
     while (args[j] != NULL) {
         if (strcmp(args[j], ">") == 0) {
             char* filename = args[j+1];
-            args[j] = 1;
+            args[j] = 0;
             int fd = open(filename, O_CREAT|O_RDWR ,0755);  // tail would be 
             if (fd == -1) {
                 perror("File error");
@@ -42,7 +42,7 @@ void exec_command(char* command) {
         
         } else if (strcmp(args[j], "2>") == 0) {
             char* filename = args[j+1];
-            args[j] = 2;
+            args[j] = 0;
             int fd = open(filename, O_CREAT|O_RDWR ,0755);  // tail would be 
             if (fd == -1) {
                 perror("File error");
@@ -115,10 +115,15 @@ int main(int argc, char** argv) {
 
     // TODO: need to create the appropriate session folder
     //       to put our <N>.stdout and <N>.stderr files in.
-    //int counter = 0;
+    int counter = 0;
 
-    //int outfile = open(folder, O_CREAT|O_RDWR, 0644)
-
+    //int outfile = open(folder, O_CREAT|O_RDWR, 0755);
+    char fold[1000];
+    snprintf(fold, 1000, "%s/.dsh/%d",getenv("HOME"), counter);
+    while (mkdir(fold, 0755) < 0) {
+        counter++;
+        snprintf(fold, 1000, "%s/.dsh/%d",getenv("HOME"), counter);
+    }
 
     
 
@@ -136,7 +141,7 @@ int main(int argc, char** argv) {
         //char* filename = argv[];
         //fd = open(folder, O_CREAT|O_RDWR);
 
-        //dup2(fd, 1);
+        //dup2(outfile, 1);
 
 
         line[strlen(line)-1]=0; // kill the newline
@@ -145,7 +150,7 @@ int main(int argc, char** argv) {
         // TODO: restore the stdio fds before interacting
         //       with the user again
 
-        //dup2(origout, 1);
+        dup2(origout, 1);
         //close(origout);
 
         //dup2(origin, 0);
