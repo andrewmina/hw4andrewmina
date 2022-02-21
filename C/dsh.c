@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
 
     // TODO: need to create the appropriate session folder
     //       to put our <N>.stdout and <N>.stderr files in.
-    int counter = 1;
+    int counter = 0;
     int counter2 = 0;
     
 
