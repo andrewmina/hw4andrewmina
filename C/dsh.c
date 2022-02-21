@@ -24,8 +24,8 @@ void exec_command(char* command) {
                 perror("File error");
                 exit(0);
             }
-            dup2(fd, 1);
-            close(fd);
+            //dup2(fd, 1);
+            //close(fd);
         } else if (strcmp(args[j], "<") == 0) {
         
             char* filename = args[j+1];
@@ -35,8 +35,8 @@ void exec_command(char* command) {
                 perror("File error");
                 exit(0);
             }
-            dup2(fd, 0);
-            close(fd);
+            //dup2(fd, 0);
+            //close(fd);
            
         
         
@@ -48,8 +48,8 @@ void exec_command(char* command) {
                 perror("File error");
                 exit(0);
             }
-            dup2(fd, 2);  // makes it so output is written to the file
-            close(fd);
+            //dup2(fd, 2);  // makes it so output is written to the file
+            //close(fd);
         }
         j++;
     }
@@ -70,19 +70,46 @@ void exec_command(char* command) {
         
         execv(arr, args);  // executing "command"
         
+        
         token = strtok(NULL, ":"); // going to the next token
 
     }
+    fprintf(stderr,"dsh: command not found: %s\n",program);
+    exit(0);
     
 }
 
 void run(char*);
 void run_pipeline(char* head, char* tail) { 
-    fprintf(stderr,"Uh-oh, I don't know how to do pipes.");
+    //fprintf(stderr,"Uh-oh, I don't know how to do pipes.");
+
+    int fds[2] = {-1, -1};
+
+    pipe(fds);
+    // printf("Made a Pipe: %d, %d \n", fds[0], fds[1]);
+    
+ 
+    int pid = fork();
+    if (pid == 0) {
+        
+        dup2(fds[1], 1);
+        run(head);
+    }
+
+    pid = fork();
+    if(pid==0) {
+       
+        dup2(fds[0], 0);
+        run(tail);
+
+    }
+
 }
 
 void run_sequence(char* head, char* tail) { 
-    fprintf(stderr,"Uh-oh, I don't know how to do sequences.");
+    //fprintf(stderr,"Uh-oh, I don't know how to do sequences.");
+    run(head);
+    run(tail);
 }
 
 
@@ -115,17 +142,23 @@ int main(int argc, char** argv) {
 
     // TODO: need to create the appropriate session folder
     //       to put our <N>.stdout and <N>.stderr files in.
-    int counter = 0;
+    int counter = 1;
+    int counter2 = 0;
+    
 
-    //int outfile = open(folder, O_CREAT|O_RDWR, 0755);
+    
+    char folde[1000];
     char fold[1000];
-    snprintf(fold, 1000, "%s/.dsh/%d",getenv("HOME"), counter);
-    while (mkdir(fold, 0755) < 0) {
+    char fold2[1000];
+    snprintf(folde, 1000, "%s/.dsh/%d",getenv("HOME"), counter);
+    while (mkdir(folde, 0755) < 0) {
         counter++;
-        snprintf(fold, 1000, "%s/.dsh/%d",getenv("HOME"), counter);
+        snprintf(folde, 1000, "%s/.dsh/%d",getenv("HOME"), counter);
     }
 
     
+    snprintf(fold, 1000, "%s/.dsh/%d/%d.stdout",getenv("HOME"), counter, counter2);
+    snprintf(fold2, 1000, "%s/.dsh/%d/%d.stderr",getenv("HOME"), counter, counter2);
 
     printf("dsh> ");
 
@@ -135,17 +168,22 @@ int main(int argc, char** argv) {
     int origerr=dup(2);
 
     while(getline(&line,&size,stdin) > 0) {
-
+        
         // TODO: temporarily redirect stdio fds to
         //       files. This will be inherited by children.
-        //char* filename = argv[];
-        //fd = open(folder, O_CREAT|O_RDWR);
-
-        //dup2(outfile, 1);
+        int fd = open(fold, O_CREAT|O_RDWR ,0755);
+        int fd2 = open(fold2, O_CREAT|O_RDWR ,0755);
+        dup2(fd, 1);
+        dup2(fd2, 2);
+        
 
 
         line[strlen(line)-1]=0; // kill the newline
         run(line);
+        
+        counter2++;
+        snprintf(fold, 1000, "%s/.dsh/%d/%d.stdout",getenv("HOME"), counter, counter2);
+        snprintf(fold2, 1000, "%s/.dsh/%d/%d.stderr",getenv("HOME"), counter, counter2);
 
         // TODO: restore the stdio fds before interacting
         //       with the user again
@@ -153,10 +191,10 @@ int main(int argc, char** argv) {
         dup2(origout, 1);
         //close(origout);
 
-        //dup2(origin, 0);
+        dup2(origin, 0);
         // close(origout);
 
-        //dup2(origerr, 2);
+        dup2(origerr, 2);
         // close(origerr);
 
 
