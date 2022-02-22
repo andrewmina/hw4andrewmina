@@ -84,10 +84,11 @@ void run_pipeline(char* head, char* tail) {
     //fprintf(stderr,"Uh-oh, I don't know how to do pipes.");
 
     int fds[2] = {-1, -1};
+    // run(head);
 
     pipe(fds);
-    // printf("Made a Pipe: %d, %d \n", fds[0], fds[1]);
-    
+    dup2(fds[0], 1);
+    run(head);
  
     int pid = fork();
     // if (pid == 0) {
@@ -96,10 +97,12 @@ void run_pipeline(char* head, char* tail) {
     //     run(head);
     // }
 
-    pid = fork();
+    
+
+    //pid = fork();
     if(pid==0) {
        
-        dup2(fds[0], 0);
+        dup2(fds[1], 0);
         run(tail);
 
     }
