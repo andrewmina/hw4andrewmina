@@ -87,7 +87,7 @@ void run_pipeline(char* head, char* tail) {
     // run(head);
 
     pipe(fds);
-    dup2(fds[0], 1);
+    dup2(fds[0], 0);
     run(head);
  
     int pid = fork();
@@ -102,7 +102,7 @@ void run_pipeline(char* head, char* tail) {
     //pid = fork();
     if(pid==0) {
        
-        dup2(fds[1], 0);
+        dup2(fds[1], 1);
         run(tail);
 
     }
