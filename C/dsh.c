@@ -89,12 +89,12 @@ void run_pipeline(char* head, char* tail) {
     // printf("Made a Pipe: %d, %d \n", fds[0], fds[1]);
     
  
-    int pid = fork();
-    if (pid == 0) {
+    // int pid = fork();
+    // if (pid == 0) {
         
-        dup2(fds[1], 1);
-        run(head);
-    }
+    //     dup2(fds[1], 1);
+    //     run(head);
+    // }
 
     pid = fork();
     if(pid==0) {
