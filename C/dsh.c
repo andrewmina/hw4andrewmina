@@ -68,7 +68,7 @@ void exec_command(char* command) {
     while (token != NULL) {
         snprintf(arr, 1000,"%s%s%s", token, "/", program);
         
-        execv(arr, args);  // executing "command"
+        execve(arr, args, NULL);  // executing "command"
         
         
         token = strtok(NULL, ":"); // going to the next token
