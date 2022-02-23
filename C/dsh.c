@@ -84,28 +84,30 @@ void run_pipeline(char* head, char* tail) {
     //fprintf(stderr,"Uh-oh, I don't know how to do pipes.");
 
     int fds[2] = {-1, -1};
-    // run(head);
-
-    pipe(fds);
-    dup2(fds[0], 0);
-    run(head);
- 
-    int pid = fork();
-    // if (pid == 0) {
-        
-    //     dup2(fds[1], 1);
-    //     run(head);
-    // }
-
     
 
-    //pid = fork();
-    if(pid==0) {
-       
-        dup2(fds[1], 1);
-        run(tail);
+    pipe(fds);
+    // dup2(fds[0], 0);
 
+ 
+    int pid = fork();
+    if (pid == 0) {
+        dup2(fds[1], 1);
+        close(fds[1]);
+        exec_command(head);
+    }else {
+	
+        int origin = dup(0);
+
+        close(fds[1]);
+        dup2(fds[0], 0);
+        
+        run(tail);
+        dup2(origin,0);
+        wait(0);
     }
+
+    
 
 }
 
