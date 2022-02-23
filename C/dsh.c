@@ -95,17 +95,18 @@ void run_pipeline(char* head, char* tail) {
         dup2(fds[1], 1);
         close(fds[1]);
         exec_command(head);
-    }else {
-	
-        int origin = dup(0);
-
-        close(fds[1]);
-        dup2(fds[0], 0);
-        
-        run(tail);
-        dup2(origin,0);
-        wait(0);
     }
+
+	
+    int origin = dup(0);
+
+    close(fds[1]);
+    dup2(fds[0], 0);
+    
+    run(tail);
+    dup2(origin,0);
+    wait(0);
+    
 
     
 
