@@ -24,7 +24,7 @@ void exec_command(char* command) {
                 perror("File error");
                 exit(0);
             }
-            dup2(fd, 1);
+            //dup2(fd, 1);
             //close(fd);
         } else if (strcmp(args[j], "<") == 0) {
         
@@ -35,7 +35,7 @@ void exec_command(char* command) {
                 perror("File error");
                 exit(0);
             }
-            dup2(fd, 0);
+            //dup2(fd, 0);
             //close(fd);
            
         
@@ -48,7 +48,7 @@ void exec_command(char* command) {
                 perror("File error");
                 exit(0);
             }
-            dup2(fd, 2);  // makes it so output is written to the file
+            //dup2(fd, 2);  // makes it so output is written to the file
             //close(fd);
         }
         j++;
